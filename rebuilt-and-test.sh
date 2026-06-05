@@ -4,11 +4,17 @@
 set -euo pipefail
 
 echo "=========================================="
-echo " Step 1: Rebuild framework-core"
+echo " Step 1: Clone and install Automation-Framework"
 echo "=========================================="
-cd ../functional-test-framework
+FRAMEWORK_REPO="https://github.com/pratripat/Automation-Framework.git"
+FRAMEWORK_DIR="temp-automation-framework"
+
+rm -rf "$FRAMEWORK_DIR"
+git clone "$FRAMEWORK_REPO" "$FRAMEWORK_DIR" --quiet
+cd "$FRAMEWORK_DIR"
 mvn clean install -DskipTests -q
-cd ../banking-platform
+cd ..
+rm -rf "$FRAMEWORK_DIR"
 
 echo ""
 echo "=========================================="

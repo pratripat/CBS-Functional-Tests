@@ -1,6 +1,6 @@
 # Banking Functional Test Suite
 
-This repository contains the functional and end-to-end integration tests for the **Banking Platform**. These tests are built using the [Functional Test Framework](https://github.com/your-org/functional-test-framework) and provide comprehensive coverage of the platform's core business flows.
+This repository contains the functional and end-to-end integration tests for the **Banking Platform**. These tests are built using the [Functional Test Framework](https://github.com/pratripat/Automation-Framework) and provide comprehensive coverage of the platform's core business flows.
 
 ## 🏗️ Architecture Under Test
 

@@ -1,6 +1,6 @@
 # Banking Platform Microservices
 
-A dummy banking platform built with **Spring Boot** and **Java 17**, designed to demonstrate complex microservice interactions, idempotency, and distributed transaction history. This platform serves as the primary target for the [Functional Test Framework](https://github.com/your-org/functional-test-framework).
+A dummy banking platform built with **Spring Boot** and **Java 17**, designed to demonstrate complex microservice interactions, idempotency, and distributed transaction history. This platform serves as the primary target for the [Functional Test Framework](https://github.com/pratripat/Automation-Framework).
 
 ## 🏗️ Architecture
 
