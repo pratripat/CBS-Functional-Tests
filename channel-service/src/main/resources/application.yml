@@ -1,0 +1,27 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: channel-service
+
+services:
+  account-service:
+    url: ${ACCOUNT_SERVICE_URL:http://localhost:8081}
+  funds-transfer-service:
+    url: ${FUNDS_TRANSFER_SERVICE_URL:http://localhost:8082}
+  transaction-history-service:
+    url: ${TRANSACTION_HISTORY_SERVICE_URL:http://localhost:8083}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    com.banking: INFO

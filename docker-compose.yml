@@ -1,0 +1,94 @@
+version: '3.8'
+
+# Local development stack — mirrors what the functional test framework deploys
+# Usage: docker-compose up -d
+
+services:
+
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: banking
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # Core Banking System mock (WireMock standalone)
+  cbs-mock:
+    image: wiremock/wiremock:3.3.1
+    ports:
+      - "9090:8080"
+    command: --verbose
+    volumes:
+      - ./cbs-mock-stubs:/home/wiremock/mappings
+
+  account-service:
+    build: ./account-service
+    image: banking/account-service:latest
+    ports:
+      - "8081:8081"
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: banking
+      DB_USER: postgres
+      DB_PASS: postgres
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  transaction-history-service:
+    build: ./transaction-history-service
+    image: banking/transaction-history-service:latest
+    ports:
+      - "8083:8083"
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: banking
+      DB_USER: postgres
+      DB_PASS: postgres
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  funds-transfer-service:
+    build: ./funds-transfer-service
+    image: banking/funds-transfer-service:latest
+    ports:
+      - "8082:8082"
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: banking
+      DB_USER: postgres
+      DB_PASS: postgres
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      CBS_BASE_URL: http://cbs-mock:8080/cbs/operations
+      CBS_TIMEOUT_MS: 5000
+      HISTORY_SERVICE_URL: http://transaction-history-service:8083
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  channel-service:
+    build: ./channel-service
+    image: banking/channel-service:latest
+    ports:
+      - "8080:8080"
+    environment:
+      ACCOUNT_SERVICE_URL: http://account-service:8081
+      FUNDS_TRANSFER_SERVICE_URL: http://funds-transfer-service:8082
+      TRANSACTION_HISTORY_SERVICE_URL: http://transaction-history-service:8083
+    depends_on:
+      - account-service
+      - funds-transfer-service
+      - transaction-history-service
