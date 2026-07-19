@@ -16,6 +16,7 @@
         <module>transaction-history-service</module>
         <module>channel-service</module>
         <module>banking-functional-tests</module>
+	<module>mobile-functional-tests</module>
     </modules>
 
     <repositories>

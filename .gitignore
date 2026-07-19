@@ -29,3 +29,13 @@ Thumbs.db
 # Repository specific
 .repro/
 rebuilt-and-test.sh.log
+
+# Android / Gradle build outputs
+banking-mobile-app/.gradle/
+banking-mobile-app/build/
+banking-mobile-app/app/build/
+banking-mobile-app/local.properties
+
+# Temp / scratch files
+mobile_test_report
+mobile_test_report2
