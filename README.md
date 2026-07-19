@@ -233,6 +233,61 @@ mvn verify -pl mobile-functional-tests -am \
   -Dfailsafe.failIfNoSpecifiedTests=false
 ```
 
+### How to add a new mobile test
+
+Adding a test involves two steps: write the test method, then register it in the suite.
+
+**Step 1 — Write the test method** in `MobileFunctionalSuite.java`:
+
+```java
+private TestResult testMyNewFeature(TestContext ctx) throws Exception {
+    // (Optional) Stub CBS mock if your test involves funds-transfer
+    ctx.getMockServer(CBS_MOCK).stubFor(
+        post(urlEqualTo("/funds-transfer"))
+            .willReturn(okJson(CbsStubs.fundsTransferSuccess("REF123"))));
+
+    AppiumActions ui = new AppiumActions(appiumCtx.getDriver());
+
+    // Navigate to screen (uses resource-ID internally)
+    ui.tapDashboardButton("Balance Check");
+
+    // Fill input field (falls back to XPath by hint for "Account Number")
+    ui.typeInField("Account Number", TEST_ACCOUNT);
+
+    // Click submit button (uses resource-ID map)
+    ui.tapButton("Check Balance");
+
+    // Assert result appears
+    ui.waitForText("Available Balance");
+    assertThat(ui.getTextByResourceId("tvBalanceResult"))
+        .as("Balance result should show INR")
+        .contains("INR");
+
+    return TestResult.builder().status(TestStatus.PASSED).build();
+}
+```
+
+**Step 2 — Register the test** in the `MobileFunctionalSuite()` constructor:
+
+```java
+addTest(TestCaseDefinition.builder()
+    .id("MOB-008")
+    .name("My New Feature — description of what it validates")
+    .tags(List.of("regression", "my-feature"))
+    .dependsOn(List.of("MOB-001"))  // dashboard must load first
+    .testCase(this::testMyNewFeature)
+    .build());
+```
+
+**If you need a new screen or button in the APK:**
+
+1. Add the resource ID in `banking-mobile-app/app/src/main/res/layout/activity_main.xml`
+2. Add the screen logic in `MainActivity.kt` (button click → API call → result display)
+3. Add entries to the `DASHBOARD_BUTTONS`, `SUBMIT_BUTTONS`, or `INPUT_FIELDS` maps in `AppiumActions.java`
+4. Rebuild the APK: `cd banking-mobile-app && ./gradlew assembleDebug`
+
+The infrastructure (emulator boot, Appium, port forwarding, ADB health checks) requires no changes.
+
 ### Key mobile components
 
 | File | Role |
