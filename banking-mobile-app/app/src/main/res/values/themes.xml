@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.BankingMobile" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:buttonStyle">@style/Widget.Button.NormalCase</item>
+    </style>
+
+    <style name="Widget.Button.NormalCase" parent="Widget.AppCompat.Button">
+        <item name="android:textAllCaps">false</item>
+    </style>
+</resources>
