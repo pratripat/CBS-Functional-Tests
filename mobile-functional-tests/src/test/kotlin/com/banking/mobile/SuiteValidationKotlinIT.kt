@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test
  * internally consistent. It runs without an emulator or Appium — it's a pure
  * configuration validation.
  */
-class SuiteValidationIT {
+class SuiteValidationKotlinIT {
 
     @Test
     fun `all seven MOB tests are registered in the suite`() {

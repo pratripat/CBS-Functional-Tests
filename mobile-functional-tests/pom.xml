@@ -143,9 +143,9 @@
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <version>3.2.3</version>
                 <configuration>
+                    <!-- Default: only Kotlin tests (suffix KotlinIT). Use -Prun-java-tests to include Java too. -->
                     <includes>
-                        <include>**/*IT.java</include>
-                        <include>**/*IT.kt</include>
+                        <include>**/*KotlinIT</include>
                     </includes>
                     <!-- Pass apk.path system property through to test JVM -->
                     <systemPropertyVariables>
@@ -163,4 +163,25 @@
             </plugin>
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <id>run-java-tests</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <configuration>
+                            <includes combine.self="override">
+                                <include>**/*IT</include>
+                            </includes>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

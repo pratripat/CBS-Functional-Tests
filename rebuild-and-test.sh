@@ -10,7 +10,16 @@ error()   { echo -e "${RED}[ERROR]${NC} $*"; }
 # Mobile tests are ON by default — set SKIP_MOBILE=true to skip
 SKIP_MOBILE="${SKIP_MOBILE:-false}"
 SKIP_API="${SKIP_API:-false}"
+JAVA_TESTS=false
 APK_PATH=""
+
+# Parse flags: --java-tests runs both Kotlin and Java tests
+for arg in "$@"; do
+    case "$arg" in
+        --java-tests) JAVA_TESTS=true ;;
+        *) ;;
+    esac
+done
 
 # ── Step 1: Build service JARs ────────────────────────────────────────────────
 info "Step 1/5: Building microservice JARs..."
@@ -90,8 +99,15 @@ else
     info "Step 5/5: Running mobile functional tests..."
     warning "Android emulator boot takes 5-10 min on first run — this is normal"
 
+    MAVEN_ARGS=()
+    if [ "$JAVA_TESTS" = "true" ]; then
+        warning "Including Java test fallback (--java-tests)"
+        MAVEN_ARGS+=("-Prun-java-tests")
+    fi
+
     mvn verify -pl mobile-functional-tests -am -B \
-        -Dapk.path="$APK_PATH"
+        -Dapk.path="$APK_PATH" \
+        "${MAVEN_ARGS[@]}"
 
     info "Mobile functional tests complete"
 fi
@@ -99,6 +115,7 @@ fi
 echo ""
 info "All done! ✓"
 echo ""
-echo "  Run everything:          ./rebuild-and-test.sh"
-echo "  Run API tests only:      SKIP_MOBILE=true ./rebuild-and-test.sh"
-echo "  Run mobile tests only:   SKIP_API=true ./rebuild-and-test.sh"
+echo "  Run everything (Kotlin only):     ./rebuild-and-test.sh"
+echo "  Include Java fallback tests:      ./rebuild-and-test.sh --java-tests"
+echo "  Run API tests only:               SKIP_MOBILE=true ./rebuild-and-test.sh"
+echo "  Run mobile tests only:            SKIP_API=true ./rebuild-and-test.sh"
