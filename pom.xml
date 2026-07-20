@@ -37,6 +37,7 @@
         <mapstruct.version>1.5.5.Final</mapstruct.version>
         <testcontainers.version>1.19.4</testcontainers.version>
         <framework.core.version>1.0.12</framework.core.version>
+        <kotlin.version>1.9.22</kotlin.version>
     </properties>
 
     <dependencyManagement>
