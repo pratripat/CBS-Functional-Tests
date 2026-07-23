@@ -6,18 +6,23 @@ Pass all 7 mobile functional tests (MOB-001 through MOB-007) by making the Andro
 ## Important Details
 - Emulator runs on host with `-gpu host` (Mesa Intel GPU)
 - Service containers (Testcontainers) use **random host ports** — the APK hardcodes `http://10.0.2.2:8080` (channel-service) and `http://10.0.2.2:8081` (account-service)
-- Fixed with a `PortForwarder` Java TCP proxy: listens on 8080/8081 and forwards to the actual dynamic ports; started/stopped in `MobileFunctionalSuite.beforeAll()`/`afterAll()`
+- Fixed with a `PortForwarder` TCP proxy: listens on 8080/8081 and forwards to the actual dynamic ports; started/stopped in `MobileFunctionalSuite.beforeAll()`/`afterAll()`
 - Channel-service is the single gateway; all API calls should go through `BuildConfig.BASE_URL` (port 8080), except deposit which goes directly to account-service via `BuildConfig.ACCOUNT_BASE_URL`
 - Funds-transfer-service calls CBS mock at `POST /funds-transfer`, not `/cbs/operations/funds-transfer`
 - Funds-transfer-service has a per-transaction limit of 1,000,000
 - `tapButton("Deposit")` and `tapDashboardButton("Deposit")` both match the dashboard toggle's text; the submit button was renamed to "Submit Deposit" to disambiguate
-- All tests use `mvn verify -pl mobile-functional-tests -am -Dit.test=MobileFunctionalIT -Dapk.path=... -Dfailsafe.failIfNoSpecifiedTests=false`
+- **Kotlin-first**: Kotlin test classes use suffix `KotlinIT` (e.g. `SuiteValidationKotlinIT`). Failsafe default includes `**/*KotlinIT`. To also run Java tests, use `-Prun-java-tests`
 
 ## Results
-All 7 tests pass. Build command:
+All 7 tests pass. Build command (Kotlin-only default):
 ```bash
 ./gradlew assembleDebug  # in banking-mobile-app/
-mvn verify -pl mobile-functional-tests -am -Dit.test=MobileFunctionalIT -Dapk.path=$(pwd)/banking-mobile-app/app/build/outputs/apk/debug/app-debug.apk -Dfailsafe.failIfNoSpecifiedTests=false
+mvn verify -pl mobile-functional-tests -am -Dapk.path=$(pwd)/banking-mobile-app/app/build/outputs/apk/debug/app-debug.apk
+```
+
+To include Java fallback tests:
+```bash
+mvn verify -pl mobile-functional-tests -am -Prun-java-tests -Dapk.path=...
 ```
 
 ## File Manifest
